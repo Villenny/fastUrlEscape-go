@@ -106,3 +106,4 @@ Ryan Haksi [ryan.haksi@gmail.com]
 ## License
 
 Available under the BSD [License](/LICENSE). Or any license really, do what you like
+
