@@ -28,7 +28,36 @@ The expected use case:
 	import "github.com/villenny/fastUrlEscape-go"
 
 	var buf [1024]byte
-        buf = AppendPathEscape(buf[:0], "some string to escape")
+	buf = AppendPathEscape(buf[:0], some_string_to_escape))
+```
+
+if you need large buffers, probably you want
+```
+	// used to amortize the cost of the memclear of the buffer.
+	// go doesnt provide any way to allocate a byte slice on the stack that isnt cleared to all 0's
+	var pool = sync.Pool{
+		New: func() interface{} {
+			bb := bytes.Buffer{}
+			bb.Grow(8192)
+			return &bb
+		},
+	}
+	
+	func BytesAsString(bs []byte) string {
+		// from strings.Builder
+		return *(*string)(unsafe.Pointer(&bs))
+	}
+
+	import "github.com/villenny/fastUrlEscape-go"
+
+	bb := pool.Get().(*bytes.Buffer)
+	buf := bb.Bytes()[:0]
+	
+	buf = append(buf, "SOME STRING"...)
+	buf = strconv.AppendInt(buf, 666, 10)
+	buf = AppendQueryEscape(buf, "some string to escape"))
+
+	pool.Put(bb)
 
 ```
 
@@ -36,6 +65,7 @@ The expected use case:
 ## Benchmark
 
 - from my machine
+- at [1024]byte and bigger, you're better off with a sync pool than a stack variable (due to the cost of clearing the stack allocation to all zeros)
 
 ```
 $ ./bench.sh
@@ -55,15 +85,18 @@ goos: windows
 goarch: amd64
 pkg: github.com/villenny/fastUrlEscape-go
 BenchmarkPathEscape
-BenchmarkPathEscape-8            4392124               543 ns/op             160 B/op          2 allocs/op
+BenchmarkPathEscape-8                            4432632               544 ns/op             160 B/op          2 allocs/op
 BenchmarkQueryEscape
-BenchmarkQueryEscape-8           4376107               563 ns/op             160 B/op          2 allocs/op
+BenchmarkQueryEscape-8                           4384117               573 ns/op             160 B/op          2 allocs/op
 BenchmarkAppendPathEscape
-BenchmarkAppendPathEscape-8     15805736               155 ns/op               0 B/op          0 allocs/op
+BenchmarkAppendPathEscape-8                     15910676               154 ns/op               0 B/op          0 allocs/op
 BenchmarkAppendQueryEscape
-BenchmarkAppendQueryEscape-8    13650548               157 ns/op               0 B/op          0 allocs/op
+BenchmarkAppendQueryEscape-8                    15205501               158 ns/op               0 B/op          0 allocs/op
+BenchmarkAppendQueryEscape_syncPool
+BenchmarkAppendQueryEscape_syncPool-8           15302218               156 ns/op               0 B/op          0 allocs/op
 PASS
-ok      github.com/villenny/fastUrlEscape-go    11.091s
+ok      github.com/villenny/fastUrlEscape-go    13.953s
+
 ```
 
 ## Contact
@@ -72,4 +105,4 @@ Ryan Haksi [ryan.haksi@gmail.com]
 
 ## License
 
-Available under the MIT [License](/LICENSE).
+Available under the BSD [License](/LICENSE). Or any license really, do what you like
