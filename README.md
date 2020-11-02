@@ -28,6 +28,7 @@ The expected use case:
 	import "github.com/villenny/fastUrlEscape-go"
 
 	var buf [1024]byte
+        buf = AppendPathEscape(buf[:0], "some string to escape")
 
 ```
 
