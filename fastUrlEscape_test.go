@@ -1,7 +1,9 @@
 package fastUrlEscape
 
 import (
+	"bytes"
 	"net/url"
+	"sync"
 	"testing"
 	"unsafe"
 
@@ -104,10 +106,39 @@ PASS
 func BenchmarkAppendQueryEscape(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
+		// for bufs <= 1024 you can beat a sync.pool
 		var buf [1024]byte
 		s := BytesAsString(AppendQueryEscape(buf[:0], ESCAPE_ME))
 		if s == "" {
 			panic("WTF")
 		}
+	}
+}
+
+// used to amortize the cost of the memclear of the buffer.
+// go doesnt provide any way to allocate a byte slice on the stack that isnt cleared to all 0's
+var pool = sync.Pool{
+	New: func() interface{} {
+		bb := bytes.Buffer{}
+		bb.Grow(8192)
+		return &bb
+	},
+}
+
+/*
+pkg: bitbucket.org/kidozteam/bidder-server/pkg/helper/fastUrlEscape
+BenchmarkAppendQueryEscape_syncPool
+BenchmarkAppendQueryEscape_syncPool-8   	 7651221	       158 ns/op	       0 B/op	       0 allocs/op
+PASS
+*/
+func BenchmarkAppendQueryEscape_syncPool(b *testing.B) {
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		bb := pool.Get().(*bytes.Buffer)
+		s := BytesAsString(AppendQueryEscape(bb.Bytes()[:0], ESCAPE_ME))
+		if s == "" {
+			panic("WTF")
+		}
+		pool.Put(bb)
 	}
 }
