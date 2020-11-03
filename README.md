@@ -2,8 +2,8 @@
 [![GitHub forks](https://img.shields.io/github/forks/Villenny/fastUrlEscape-go)](https://github.com/Villenny/fastUrlEscape-go/network)
 [![GitHub stars](https://img.shields.io/github/stars/Villenny/fastUrlEscape-go)](https://github.com/Villenny/fastUrlEscape-go/stargazers)
 [![GitHub license](https://img.shields.io/github/license/Villenny/fastUrlEscape-go)](https://github.com/Villenny/fastUrlEscape-go/blob/master/LICENSE)
-![Go](https://github.com/Villenny/fastUrlEscape-go/workflows/Go/badge.svg?branch=master)
-![Codecov branch](https://img.shields.io/codecov/c/github/villenny/fastUrlEscape-go/master)
+![Go](https://github.com/Villenny/fastUrlEscape-go/workflows/Go/badge.svg?branch=main)
+![Codecov branch](https://img.shields.io/codecov/c/github/villenny/fastUrlEscape-go/main)
 [![Go Report Card](https://goreportcard.com/badge/github.com/Villenny/fastUrlEscape-go)](https://goreportcard.com/report/github.com/Villenny/fastUrlEscape-go)
 [![Documentation](https://godoc.org/github.com/Villenny/fastUrlEscape-go?status.svg)](http://godoc.org/github.com/Villenny/fastUrlEscape-go)
 
