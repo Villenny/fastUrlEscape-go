@@ -57,6 +57,9 @@ if you need large buffers, probably you want
 	buf = strconv.AppendInt(buf, 666, 10)
 	buf = AppendQueryEscape(buf, "some string to escape"))
 
+	if bb.Cap() > 8192 {
+		bb = pool.New().(*bytes.Buffer)
+	}
 	pool.Put(bb)
 
 ```
