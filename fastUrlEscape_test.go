@@ -18,6 +18,7 @@ func BytesAsString(bs []byte) string {
 const DONT_ESCAPE_ME = "there-is-nothing-to-escape-here"
 const ESCAPE_ME = "https://host.domain.com/some/url/path?arg1=one&arg2=two"
 const ESCAPE_ME_QUERY_ARG = "one & two ? three / four"
+const ESCAPE_ME_QUERY_ONLY_SPACE = "one two three four"
 
 func TestPathEscape(t *testing.T) {
 	t.Run("early outs when nothing to escape", func(t *testing.T) {
@@ -47,9 +48,16 @@ func TestPathEscape(t *testing.T) {
 }
 
 func TestQueryEscape(t *testing.T) {
-	var buf [1024]byte
-	s := BytesAsString(AppendQueryEscape(buf[:0], ESCAPE_ME_QUERY_ARG))
-	assert.Equal(t, url.QueryEscape(ESCAPE_ME_QUERY_ARG), s)
+	t.Run("does a mix of substitution", func(t *testing.T) {
+		var buf [1024]byte
+		s := BytesAsString(AppendQueryEscape(buf[:0], ESCAPE_ME_QUERY_ARG))
+		assert.Equal(t, url.QueryEscape(ESCAPE_ME_QUERY_ARG), s)
+	})
+	t.Run("handles special case of all space substitution", func(t *testing.T) {
+		var buf [1024]byte
+		s := BytesAsString(AppendQueryEscape(buf[:0], ESCAPE_ME_QUERY_ONLY_SPACE))
+		assert.Equal(t, url.QueryEscape(ESCAPE_ME_QUERY_ONLY_SPACE), s)
+	})
 }
 
 /*

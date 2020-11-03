@@ -51,13 +51,17 @@ func AppendPathEscape(buf []byte, s string) []byte {
 
 func appendEscape(buf []byte, s string, lut []bool) []byte {
 	hexCount := 0
+	hasSpaces := false
 	for i := 0; i < len(s); i++ {
+		if s[i] == ' ' {
+			hasSpaces = true
+		}
 		if lut[s[i]] {
 			hexCount++
 		}
 	}
 
-	if hexCount == 0 {
+	if !hasSpaces && hexCount == 0 {
 		return append(buf, s...)
 	}
 
