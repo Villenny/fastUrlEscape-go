@@ -17,6 +17,7 @@ func BytesAsString(bs []byte) string {
 
 const DONT_ESCAPE_ME = "there-is-nothing-to-escape-here"
 const ESCAPE_ME = "https://host.domain.com/some/url/path?arg1=one&arg2=two"
+const ESCAPE_ME_QUERY_ARG = "one & two ? three / four"
 
 func TestPathEscape(t *testing.T) {
 	t.Run("early outs when nothing to escape", func(t *testing.T) {
@@ -28,6 +29,9 @@ func TestPathEscape(t *testing.T) {
 		var buf [1024]byte
 		s := BytesAsString(AppendPathEscape(buf[:0], ESCAPE_ME))
 		assert.Equal(t, url.PathEscape(ESCAPE_ME), s)
+
+		s = BytesAsString(AppendPathEscape(buf[:0], ESCAPE_ME_QUERY_ARG))
+		assert.Equal(t, url.PathEscape(ESCAPE_ME_QUERY_ARG), s)
 	})
 	t.Run("allocates when buf is too small", func(t *testing.T) {
 		var buf [16]byte
@@ -44,8 +48,8 @@ func TestPathEscape(t *testing.T) {
 
 func TestQueryEscape(t *testing.T) {
 	var buf [1024]byte
-	s := BytesAsString(AppendQueryEscape(buf[:0], ESCAPE_ME))
-	assert.Equal(t, url.QueryEscape(ESCAPE_ME), s)
+	s := BytesAsString(AppendQueryEscape(buf[:0], ESCAPE_ME_QUERY_ARG))
+	assert.Equal(t, url.QueryEscape(ESCAPE_ME_QUERY_ARG), s)
 }
 
 /*
@@ -65,9 +69,9 @@ func BenchmarkPathEscape(b *testing.B) {
 }
 
 /*
-pkg: bitbucket.org/kidozteam/bidder-server/pkg/helper/fastUrlEscape
+pkg: bitbucket.org/kidozteam/bidder-server/pkg/platform/fastUrlEscape
 BenchmarkQueryEscape
-BenchmarkQueryEscape-8   	 1909773	       685 ns/op	     160 B/op	       2 allocs/op
+BenchmarkQueryEscape-8   	 2114870	       586 ns/op	     160 B/op	       2 allocs/op
 PASS
 */
 func BenchmarkQueryEscape(b *testing.B) {
@@ -135,9 +139,14 @@ func BenchmarkAppendQueryEscape_syncPool(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		bb := pool.Get().(*bytes.Buffer)
+
 		s := BytesAsString(AppendQueryEscape(bb.Bytes()[:0], ESCAPE_ME))
 		if s == "" {
 			panic("WTF")
+		}
+
+		if bb.Cap() > 8192 {
+			bb = pool.New().(*bytes.Buffer)
 		}
 		pool.Put(bb)
 	}

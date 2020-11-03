@@ -36,7 +36,7 @@ func shouldQueryEscape(c byte) bool {
 		return false
 	}
 	switch c {
-	case '-', '_', '.', '~', '@', '+', '$':
+	case '-', '_', '.', '~', '@', '+', '$', ' ':
 		return false
 	}
 	return true
@@ -86,6 +86,12 @@ func appendEscape(buf []byte, s string, lut []bool) []byte {
 			t[j+1] = "0123456789ABCDEF"[c>>4]
 			t[j] = '%'
 			j += 3
+
+		} else if c == ' ' {
+			// if space isnt converted to hex, convert it to plus symbol
+			t[j] = '+'
+			j++
+
 		} else {
 			t[j] = c
 			j++
