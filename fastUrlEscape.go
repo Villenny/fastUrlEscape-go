@@ -1,6 +1,6 @@
 package fastUrlEscape
 
-func MakePathLUT() []bool {
+func makePathLUT() []bool {
 	var lut [256]bool
 	for i := 0; i < 256; i += 1 {
 		lut[i] = shouldPathEscape(byte(i))
@@ -8,9 +8,9 @@ func MakePathLUT() []bool {
 	return lut[0:]
 }
 
-var pathLUT []bool = MakePathLUT()
+var pathLUT []bool = makePathLUT()
 
-func MakeQueryLUT() []bool {
+func makeQueryLUT() []bool {
 	var lut [256]bool
 	for i := 0; i < 256; i += 1 {
 		lut[i] = shouldQueryEscape(byte(i))
@@ -18,7 +18,7 @@ func MakeQueryLUT() []bool {
 	return lut[0:]
 }
 
-var queryLUT []bool = MakeQueryLUT()
+var queryLUT []bool = makeQueryLUT()
 
 func shouldPathEscape(c byte) bool {
 	if 'A' <= c && c <= 'Z' || 'a' <= c && c <= 'z' || '0' <= c && c <= '9' {
