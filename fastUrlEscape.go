@@ -68,6 +68,10 @@ func appendEscape(buf []byte, s string, lut []bool) []byte {
 	cb := cap(buf)
 	lb := len(buf)
 	ls := len(s)
+	
+	if cb == 0 {
+		panic("passed a zero size buffer, use like var buf [512]byte, appendEscape(buf[:0], someQueryArg)")
+	}
 
 	spaceRequired := ls + 2*hexCount
 	bufRequired := spaceRequired + lb
