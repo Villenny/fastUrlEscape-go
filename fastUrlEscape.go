@@ -69,9 +69,14 @@ func appendEscape(buf []byte, s string, lut []bool) []byte {
 	lb := len(buf)
 	ls := len(s)
 
-	if cb == 0 {
-		panic("passed a zero size buffer, use like var buf [512]byte, appendEscape(buf[:0], someQueryArg)")
-	}
+	/*
+		Honestly this is probably the best solution to being passed a zero size slice, I have no idea why you would do this
+		It would guarantee an allocation
+
+			if cb == 0 {
+				panic("passed a zero size buffer, use like var buf [512]byte, appendEscape(buf[:0], someQueryArg)")
+			}
+	*/
 
 	spaceRequired := ls + 2*hexCount
 	bufRequired := spaceRequired + lb

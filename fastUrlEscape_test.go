@@ -40,6 +40,11 @@ func TestPathEscape(t *testing.T) {
 		s := BytesAsString(AppendPathEscape(buf[:0], ESCAPE_ME))
 		assert.Equal(t, url.PathEscape(ESCAPE_ME), s)
 	})
+	t.Run("allocates when passed a zero size slice?!?", func(t *testing.T) {
+		var buf []byte
+		s := BytesAsString(AppendPathEscape(buf, ESCAPE_ME))
+		assert.Equal(t, url.PathEscape(ESCAPE_ME), s)
+	})
 	t.Run("concats to existing buffer", func(t *testing.T) {
 		var buf [1024]byte
 		slice := append(buf[:0], "hello "...)
