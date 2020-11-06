@@ -36,7 +36,7 @@ func shouldQueryEscape(c byte) bool {
 		return false
 	}
 	switch c {
-	case '-', '_', '.', '~', '@', '+', '$', ' ':
+	case '-', '_', '.', '~', ' ':
 		return false
 	}
 	return true
@@ -68,7 +68,7 @@ func appendEscape(buf []byte, s string, lut []bool) []byte {
 	cb := cap(buf)
 	lb := len(buf)
 	ls := len(s)
-	
+
 	if cb == 0 {
 		panic("passed a zero size buffer, use like var buf [512]byte, appendEscape(buf[:0], someQueryArg)")
 	}
@@ -77,6 +77,9 @@ func appendEscape(buf []byte, s string, lut []bool) []byte {
 	bufRequired := spaceRequired + lb
 	if cb-lb < spaceRequired {
 		for cb <<= 1; cb < bufRequired; cb <<= 1 {
+			if cb == 0 {
+				cb = 64
+			}
 		}
 		buf2 := make([]byte, cb)
 		copy(buf2, buf)

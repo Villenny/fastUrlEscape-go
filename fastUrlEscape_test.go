@@ -19,6 +19,7 @@ const DONT_ESCAPE_ME = "there-is-nothing-to-escape-here"
 const ESCAPE_ME = "https://host.domain.com/some/url/path?arg1=one&arg2=two"
 const ESCAPE_ME_QUERY_ARG = "one & two ? three / four"
 const ESCAPE_ME_QUERY_ONLY_SPACE = "one two three four"
+const ESCAPE_ME_ALL_THE_SPECIAL_CHARS = " ?&=#+%!<>#\"{}|\\^[]`☺\t:/@$'()*,;"
 
 func TestPathEscape(t *testing.T) {
 	t.Run("early outs when nothing to escape", func(t *testing.T) {
@@ -45,6 +46,13 @@ func TestPathEscape(t *testing.T) {
 		s := BytesAsString(AppendPathEscape(slice, ESCAPE_ME))
 		assert.Equal(t, "hello "+url.PathEscape(ESCAPE_ME), s)
 	})
+	t.Run("all the special chars", func(t *testing.T) {
+		var buf [1024]byte
+		slice := buf[:0]
+		s := BytesAsString(AppendPathEscape(slice, ESCAPE_ME_ALL_THE_SPECIAL_CHARS))
+		u := url.PathEscape(ESCAPE_ME_ALL_THE_SPECIAL_CHARS)
+		assert.Equal(t, u, s)
+	})
 }
 
 func TestQueryEscape(t *testing.T) {
@@ -57,6 +65,12 @@ func TestQueryEscape(t *testing.T) {
 		var buf [1024]byte
 		s := BytesAsString(AppendQueryEscape(buf[:0], ESCAPE_ME_QUERY_ONLY_SPACE))
 		assert.Equal(t, url.QueryEscape(ESCAPE_ME_QUERY_ONLY_SPACE), s)
+	})
+	t.Run("all the special chars", func(t *testing.T) {
+		var buf [1024]byte
+		slice := buf[:0]
+		s := BytesAsString(AppendQueryEscape(slice, ESCAPE_ME_ALL_THE_SPECIAL_CHARS))
+		assert.Equal(t, url.QueryEscape(ESCAPE_ME_ALL_THE_SPECIAL_CHARS), s)
 	})
 }
 
