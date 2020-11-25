@@ -96,9 +96,10 @@ func BenchmarkPathEscape(b *testing.B) {
 }
 
 /*
-pkg: bitbucket.org/kidozteam/bidder-server/pkg/platform/fastUrlEscape
+pkg: github.com/villenny/fastUrlEscape-go
 BenchmarkQueryEscape
-BenchmarkQueryEscape-8   	 2114870	       586 ns/op	     160 B/op	       2 allocs/op
+BenchmarkQueryEscape-8
+ 2100081	       652 ns/op	     160 B/op	       2 allocs/op
 PASS
 */
 func BenchmarkQueryEscape(b *testing.B) {
@@ -112,9 +113,10 @@ func BenchmarkQueryEscape(b *testing.B) {
 }
 
 /*
-pkg: bitbucket.org/kidozteam/bidder-server/pkg/helper/fastUrlEscape
+pkg: github.com/villenny/fastUrlEscape-go
 BenchmarkAppendPathEscape
-BenchmarkAppendPathEscape-8   	 7673206	       152 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAppendPathEscape-8
+ 4017529	       291 ns/op	       0 B/op	       0 allocs/op
 PASS
 */
 func BenchmarkAppendPathEscape(b *testing.B) {
@@ -129,17 +131,37 @@ func BenchmarkAppendPathEscape(b *testing.B) {
 }
 
 /*
-pkg: bitbucket.org/kidozteam/bidder-server/pkg/helper/fastUrlEscape
-BenchmarkAppendQueryEscape
-BenchmarkAppendQueryEscape-8   	 6756363	       148 ns/op	       0 B/op	       0 allocs/op
+pkg: github.com/villenny/fastUrlEscape-go
+BenchmarkAppendQueryEscape_Bytearray
+BenchmarkAppendQueryEscape_Bytearray-8
+ 4305537	       292 ns/op	       0 B/op	       0 allocs/op
 PASS
 */
-func BenchmarkAppendQueryEscape(b *testing.B) {
+func BenchmarkAppendQueryEscape_Bytearray(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		// for bufs <= 1024 you can beat a sync.pool
 		var buf [1024]byte
 		s := BytesAsString(AppendQueryEscape(buf[:0], ESCAPE_ME))
+		if s == "" {
+			panic("WTF")
+		}
+	}
+}
+
+/*
+pkg: github.com/villenny/fastUrlEscape-go
+BenchmarkAppendQueryEscape_Make
+BenchmarkAppendQueryEscape_Make-8
+ 4274898	       295 ns/op	       0 B/op	       0 allocs/op
+PASS
+*/
+func BenchmarkAppendQueryEscape_Make(b *testing.B) {
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		// for bufs <= 1024 you can beat a sync.pool
+		buf := make([]byte, 1024)[:0]
+		s := BytesAsString(AppendQueryEscape(buf, ESCAPE_ME))
 		if s == "" {
 			panic("WTF")
 		}
@@ -157,9 +179,10 @@ var pool = sync.Pool{
 }
 
 /*
-pkg: bitbucket.org/kidozteam/bidder-server/pkg/helper/fastUrlEscape
+pkg: github.com/villenny/fastUrlEscape-go
 BenchmarkAppendQueryEscape_syncPool
-BenchmarkAppendQueryEscape_syncPool-8   	 7651221	       158 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAppendQueryEscape_syncPool-8
+ 4229742	       300 ns/op	       0 B/op	       0 allocs/op
 PASS
 */
 func BenchmarkAppendQueryEscape_syncPool(b *testing.B) {
